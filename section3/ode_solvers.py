@@ -2,7 +2,7 @@
 
 We integrate the harmonic oscillator, x'' = -omega^2 x, with omega = 1.  We
 know the exact solution, x(t) = cos t.  Four parts: Euler's method at two step sizes, the order of accuracy read off a log-log plot of the error, the same for RK4, 
-and the same trajectory plots for velocity Verlet along with its energy fluctuation.
+and the same trajectory plots for symplectic Euler along with its energy fluctuation.
 
 Run one part at a time (or all of them) from the command line, e.g.:
 
@@ -59,12 +59,11 @@ def rk4_step(y, dt):
     return y + (dt / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
 
 
-def verlet_step(y, dt, omega=OMEGA):
-    """One velocity-Verlet step: half kick, drift, half kick (m = 1, p = xdot)."""
+def symplectic_euler_step(y, dt, omega=OMEGA):
+    """One symplectic-Euler step: kick, then drift (m = 1, p = xdot)."""
     x, p = y
-    p = p - 0.5 * dt * omega**2 * x
+    p = p - dt * omega**2 * x
     x = x + dt * p
-    p = p - 0.5 * dt * omega**2 * x
     return np.array([x, p])
 
 
@@ -185,18 +184,18 @@ def part_c():
 
 
 def part_d():
-    """Velocity Verlet at the same two step sizes, and its energy fluctuation."""
+    """Symplectic Euler at the same two step sizes, and its energy fluctuation."""
     out_dir = _ensure_dir(BASE_DIR / "part_d")
-    _plot_method(verlet_step, "Velocity Verlet", out_dir / "part_d_verlet.png")
+    _plot_method(symplectic_euler_step, "Symplectic Euler", out_dir / "part_d_symplectic_euler.png")
 
     fig, ax = plt.subplots()
     for dt in DTS:
-        t, ys = integrate(verlet_step, dt)
+        t, ys = integrate(symplectic_euler_step, dt)
         E = energy(ys)
         ax.plot(t, (E - E[0]) / abs(E[0]), lw=1, label=f"$\\Delta t = {dt}$")
     ax.set_xlabel("$t$")
     ax.set_ylabel("$[E(t) - E(0)] / |E(0)|$")
-    ax.set_title("Velocity Verlet energy fluctuation")
+    ax.set_title("Symplectic Euler energy fluctuation")
     ax.legend()
     fig.tight_layout()
     fig.savefig(out_dir / "part_d_energy.png", dpi=150)
