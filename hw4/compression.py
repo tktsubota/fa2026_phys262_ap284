@@ -97,7 +97,7 @@ def part_d():
     size = save_bits(bits, "sample_5bit")
     print("  5-bit       %7.1f kB  %.3f bits/letter" % (size / 1e3, 8 * size / N))
 
-    # TODO: Other encodings
+    # TODO: Other encodings. One general-purpose compressor is lzma.compress(...).
 
 
 def part_e():
